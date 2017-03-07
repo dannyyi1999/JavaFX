@@ -10,14 +10,19 @@
  */
 
 
+import java.awt.FileDialog;
+import java.awt.Frame;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 
@@ -25,6 +30,8 @@ public class GridDriver extends Application{
 
 	private GridModel <Boolean> model;
 	private BooleanGridPane gridPane;
+	private Button clear;
+	private Button load;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -55,6 +62,13 @@ public class GridDriver extends Application{
 		slide.setMajorTickUnit(5);
 		slide.valueProperty().addListener(new SlideHandler());
 		
+		HBox hbox = new HBox();
+		clear = new Button("Clear");
+		clear.setOnMouseClicked(new ButtonHandler());
+		load = new Button("Load");
+		hbox.getChildren().addAll(clear, load);
+		
+		root.setTop(hbox);
 		root.setCenter(gridPane);
 		root.setBottom(slide);
 		stage.setScene(scene);
@@ -89,5 +103,26 @@ public class GridDriver extends Application{
 		}
 		
 	}
+	
+	private class ButtonHandler implements EventHandler<MouseEvent> {
 
+		@Override
+		public void handle(MouseEvent e) {
+			if(e.getSource() == clear){
+				for(int i = 0; i < model.getNumRows(); i++){
+					for(int j = 0; j < model.getNumCols(); j++){
+						if(model.getValueAt(i, j)){
+							model.setValueAt(i, j, false);
+						}
+					}
+				}
+			}else if(e.getSource() == load){
+				FileDialog fd = new FileDialog(new Frame(), "Select a Color database", FileDialog.LOAD);
+				fd.setVisible(true);
+				
+			}
+		}
+		
+	}
+	
 }
