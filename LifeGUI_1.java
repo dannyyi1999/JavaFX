@@ -24,7 +24,11 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -39,6 +43,8 @@ public class LifeGUI_1 extends Application{
 	private Button load;
 	private Button nextGen;
 	Scanner in;
+	Label gen;
+	Slider slide;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -52,18 +58,21 @@ public class LifeGUI_1 extends Application{
 		Scene scene = new Scene(root, 500, 500);
 		gridPane = new BooleanGridPane();
 		
-		Boolean[][] data = {{false, false, false, false},
-							{false, false, false, false},
-							{false, false, false, false},
-							{false, false, false, false},
-							{false, false, false, false},
-							{false, false, false, false}}; 
+		Boolean[][] data = {{true, true , true , true , true},
+							{true, false, false, false, true},
+							{true, false, false, false, true},
+							{true, false, false, false, true},
+							{true, false, false, false, true},
+							{true, true , true , true , true}}; 
 		
 		model = new LifeModel(data);
 		gridPane.setModel(model);
-		gridPane.setOnMouseClicked(new GridMouseHandler());
 		
-		Slider slide = new Slider(0, 50, 10);
+		GridMouseHandler mouse = new GridMouseHandler();
+		gridPane.setOnMousePressed(mouse);
+		gridPane.setOnMouseDragged(mouse);
+		
+		slide = new Slider(0, 50, 10);
 		slide.setShowTickMarks(true);
 		slide.setShowTickLabels(true);
 		slide.setMajorTickUnit(5);
@@ -77,13 +86,20 @@ public class LifeGUI_1 extends Application{
 		nextGen = new Button ("Next Generation");
 		nextGen.setOnMouseClicked(new ButtonHandler());
 		
-		Label gen = new Label("Generation " + gridPane.getModel().getGeneration());
+		gen = new Label("Generation " + gridPane.getModel().getGeneration());
 		
-		hbox.getChildren().addAll(clear, load, nextGen, gen);
+		MenuBar menuBar = new MenuBar();
+		Menu file = new Menu("File");
+		MenuItem open = new MenuItem("Open");
+		MenuItem save = new MenuItem("Save");
+		file.getItems().addAll(open, save);
+		menuBar.getMenus().add(file);
 		
-		root.setTop(hbox);
+		hbox.getChildren().addAll(clear, load, nextGen, gen, slide);
+		
+		root.setTop(menuBar);
+		root.setBottom(hbox);
 		root.setCenter(gridPane);
-		root.setBottom(slide);
 		stage.setScene(scene);
 		stage.show();
 	}
@@ -93,7 +109,14 @@ public class LifeGUI_1 extends Application{
 		public void handle(MouseEvent e) {
 			int row = gridPane.rowForYPos(e.getY());
 			int col = gridPane.colForXPos(e.getX());
-			gridPane.getModel().setValueAt(row, col, !gridPane.getModel().getValueAt(row, col));
+			if(row >= 0 && row < gridPane.getModel().getNumRows() && col >= 0 && col < gridPane.getModel().getNumCols()){
+				if(e.getButton().equals(MouseButton.PRIMARY)){
+					gridPane.getModel().setValueAt(row, col, true);
+				}else {
+					gridPane.getModel().setValueAt(row, col, false);
+				}
+			}
+			
 		}
 	}
 	
@@ -145,6 +168,8 @@ public class LifeGUI_1 extends Application{
 				}
 			}else if(e.getSource() == nextGen){
 				gridPane.getModel().nextGeneration();
+				gen.setText("Generation " + gridPane.getModel().getGeneration());
+				
 			}
 		}
 		
