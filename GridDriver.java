@@ -12,6 +12,10 @@
 
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -28,10 +32,11 @@ import javafx.stage.Stage;
 
 public class GridDriver extends Application{
 
-	private GridModel <Boolean> model;
+	private LifeModel model;
 	private BooleanGridPane gridPane;
 	private Button clear;
 	private Button load;
+	private Scanner in;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -52,7 +57,7 @@ public class GridDriver extends Application{
 							{false, false, false, false},
 							{false, false, false, false}}; 
 		
-		model = new GridModel<Boolean>(data);
+		model = new LifeModel(data);
 		gridPane.setModel(model);
 		gridPane.setOnMouseClicked(new GridMouseHandler());
 		
@@ -66,6 +71,7 @@ public class GridDriver extends Application{
 		clear = new Button("Clear");
 		clear.setOnMouseClicked(new ButtonHandler());
 		load = new Button("Load");
+		load.setOnMouseClicked(new ButtonHandler());
 		hbox.getChildren().addAll(clear, load);
 		
 		root.setTop(hbox);
@@ -117,8 +123,29 @@ public class GridDriver extends Application{
 					}
 				}
 			}else if(e.getSource() == load){
-				FileDialog fd = new FileDialog(new Frame(), "Select a Color database", FileDialog.LOAD);
+				FileDialog fd = new FileDialog(new Frame(), "Select a grid", FileDialog.LOAD);
 				fd.setVisible(true);
+				
+				try {
+					ArrayList<String> list = new ArrayList<String>();
+					in = new Scanner(new File(fd.getDirectory() + fd.getFile()));
+					while(in.hasNext()){
+						list.add(in.nextLine());
+					}
+					Boolean[][] newData = new Boolean[list.size()][list.get(0).length() / 2 + 1];
+					for(int row = 0; row < newData.length; row++){
+						for(int col = 0; col < list.get(row).length(); col++){
+							if(list.get(row).charAt(col) == 'x'){
+								newData[row][col / 2] = false;
+							}else if(list.get(row).charAt(col) == 'o'){
+								newData[row][col / 2] = true;
+							}
+						}
+					}
+					gridPane.setModel(new LifeModel(newData));
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
 				
 			}
 		}
