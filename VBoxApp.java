@@ -24,6 +24,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -46,6 +47,7 @@ public class VBoxApp extends Application {
 
 	Button button;
 	Slider slide;
+	Rectangle[][] board;
 	
 
 
@@ -65,7 +67,14 @@ public class VBoxApp extends Application {
 		@Override
 		public void changed(ObservableValue<? extends Number> observable,
 				Number oldValue, Number newValue) {
-			spotSize = (Double)newValue;
+			for(int y = 0; y < 8; y++){
+				for(int x = 0; x < 8; x++){
+					if((y + x) % 2 == 0){
+						board[y][x].setFill(new Color
+								((Double)newValue, (Double)newValue, (Double)newValue, 1));
+					}
+				}
+			}
 		}
     	
     }
@@ -79,6 +88,7 @@ public class VBoxApp extends Application {
         CheckBox cb2 = new CheckBox("No");
         CheckBox cb3 = new CheckBox("A little");
         Group root = new Group();
+        board = new Rectangle[8][8];
 
 		for(int y = 0; y < 8; y++){
 			for(int x = 0; x < 8; x++){
@@ -104,7 +114,9 @@ public class VBoxApp extends Application {
 					square.setFill(BOARD_COLOR_TWO);
 					root.getChildren().add(square);
 				}
+				board[y][x] = square;
 			}
+			
 		}
  
         VBox vboxMeals = new VBox(5);
@@ -128,8 +140,8 @@ public class VBoxApp extends Application {
         passwordField2.setPromptText("Password");
         Label label2 = new Label("Sign in to your Slack account.");
         
-        slide = new Slider(0, 20, 20);
-        slide.setMajorTickUnit(2);
+        slide = new Slider(0, 1, 0.5);
+        slide.setMajorTickUnit(0.1);
         slide.setShowTickMarks(true);
         slide.setShowTickLabels(true);
         slide.valueProperty().addListener(new SliderListener());
