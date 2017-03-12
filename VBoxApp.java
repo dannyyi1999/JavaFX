@@ -48,6 +48,7 @@ public class VBoxApp extends Application {
 	Button button;
 	Slider slide;
 	Rectangle[][] board;
+	Label label2;
 	
 
 
@@ -56,7 +57,11 @@ public class VBoxApp extends Application {
 		@Override
 		public void handle(ActionEvent m) {
 			if(m.getSource() == button){
-				System.out.println("You just got scammed!");
+				if(label2.getText().equals("Sign into your Slack account.")){
+					label2.setText("Sign into your facebook account.");
+				}else {
+					label2.setText("Sign into your Slack account.");
+				}
 			}
 		}
     	
@@ -132,13 +137,13 @@ public class VBoxApp extends Application {
         tilePane.setPrefColumns(2); //preferred columns
         tilePane.setAlignment(Pos.CENTER);
         
-        button = new Button("CLICK HERE TO WIN 1 MILLION DOLLARS!!!");
+        button = new Button("Click here to change text");
         
         PasswordField passwordField1 = new PasswordField();
         passwordField1.setPromptText("Username");
         PasswordField passwordField2 = new PasswordField();
         passwordField2.setPromptText("Password");
-        Label label2 = new Label("Sign in to your Slack account.");
+        label2 = new Label("Sign into your Slack account.");
         
         slide = new Slider(0, 1, 0.5);
         slide.setMajorTickUnit(0.1);
