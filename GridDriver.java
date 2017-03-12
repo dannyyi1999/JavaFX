@@ -32,11 +32,11 @@ import javafx.stage.Stage;
 
 public class GridDriver extends Application{
 
-	private LifeModel model;
+	private GridModel <Boolean> model;
 	private BooleanGridPane gridPane;
 	private Button clear;
 	private Button load;
-	private Scanner in;
+	Scanner in;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -57,7 +57,7 @@ public class GridDriver extends Application{
 							{false, false, false, false},
 							{false, false, false, false}}; 
 		
-		model = new LifeModel(data);
+		model = new GridModel<Boolean>(data);
 		gridPane.setModel(model);
 		gridPane.setOnMouseClicked(new GridMouseHandler());
 		
@@ -88,12 +88,12 @@ public class GridDriver extends Application{
 			int col = gridPane.colForXPos(e.getX());
 			for(int i = row - 1; i <= row + 1; i++){
 				for(int j = col - 1; j <= col + 1; j++){
-					if(i < 0 || i > model.getNumRows() - 1 
-					|| j < 0 || j > model.getNumCols() - 1
+					if(i < 0 || i > gridPane.getModel().getNumRows() - 1 
+					|| j < 0 || j > gridPane.getModel().getNumCols() - 1
 					|| (i == row && j == col)){
 						continue;
 					}else {
-						model.setValueAt(i, j, !model.getValueAt(i, j));
+						gridPane.getModel().setValueAt(i, j, !gridPane.getModel().getValueAt(i, j));
 					}
 				}
 			}
@@ -115,38 +115,33 @@ public class GridDriver extends Application{
 		@Override
 		public void handle(MouseEvent e) {
 			if(e.getSource() == clear){
-				for(int i = 0; i < model.getNumRows(); i++){
-					for(int j = 0; j < model.getNumCols(); j++){
-						if(model.getValueAt(i, j)){
-							model.setValueAt(i, j, false);
+				for(int i = 0; i < gridPane.getModel().getNumRows(); i++){
+					for(int j = 0; j < gridPane.getModel().getNumCols(); j++){
+						if(gridPane.getModel().getValueAt(i, j)){
+							gridPane.getModel().setValueAt(i, j, false);
 						}
 					}
 				}
 			}else if(e.getSource() == load){
-				FileDialog fd = new FileDialog(new Frame(), "Select a grid", FileDialog.LOAD);
+				FileDialog fd = new FileDialog(new Frame(), "Select a Color database", FileDialog.LOAD);
 				fd.setVisible(true);
 				
 				try {
-					ArrayList<String> list = new ArrayList<String>();
 					in = new Scanner(new File(fd.getDirectory() + fd.getFile()));
-					while(in.hasNext()){
-						list.add(in.nextLine());
-					}
-					Boolean[][] newData = new Boolean[list.size()][list.get(0).length() / 2 + 1];
+					Boolean[][] newData = new Boolean[in.nextInt()][in.nextInt()];
 					for(int row = 0; row < newData.length; row++){
-						for(int col = 0; col < list.get(row).length(); col++){
-							if(list.get(row).charAt(col) == 'x'){
-								newData[row][col / 2] = false;
-							}else if(list.get(row).charAt(col) == 'o'){
-								newData[row][col / 2] = true;
+						for(int col = 0; col < newData[row].length; col++){
+							if(in.next().equalsIgnoreCase("x")){
+								newData[row][col] = false;
+							}else{
+								newData[row][col] = true;
 							}
 						}
 					}
-					gridPane.setModel(new LifeModel(newData));
+					gridPane.setModel(new GridModel<Boolean>(newData));
 				} catch (FileNotFoundException e1) {
 					e1.printStackTrace();
 				}
-				
 			}
 		}
 		
